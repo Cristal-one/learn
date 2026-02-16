@@ -144,11 +144,29 @@ footer {
 }
 
 .participants-list {
+    list-style: none;
+    padding: 0;
     margin-top: 10px;
-    padding-left: 20px;
 }
 
 .participants-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 5px;
-    color: #555;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #c62828;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 5px;
+}
+
+.delete-btn:hover {
+    color: #b71c1c;
 }

@@ -22,9 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         activityCard.innerHTML = `
           <h4>${name}</h4>
-          <p>${details.description}</p>
+          <p><strong>Description:</strong> ${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <p><strong>Max Participants:</strong> ${details.max_participants}</p>
+          <p><strong>Participants:</strong></p>
+          <ul class="participants-list">
+              ${details.participants.length > 0 ? details.participants.map(p => `<li><span>${p}</span><button class="delete-btn" data-activity="${name}" data-email="${p}">×</button></li>`).join('') : '<li>No participants yet.</li>'}
+          </ul>
         `;
 
         activitiesList.appendChild(activityCard);
@@ -34,6 +38,27 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = name;
         option.textContent = name;
         activitySelect.appendChild(option);
+      });
+
+      // Add event listener for delete buttons
+      activitiesList.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+          const activity = e.target.dataset.activity;
+          const email = e.target.dataset.email;
+          try {
+            const response = await fetch(`/activities/${encodeURIComponent(activity)}/participants/${encodeURIComponent(email)}`, {
+              method: 'DELETE'
+            });
+            if (response.ok) {
+              fetchActivities(); // refresh the list
+            } else {
+              const error = await response.json();
+              alert(error.detail || 'Failed to remove participant');
+            }
+          } catch (error) {
+            alert('Error removing participant');
+          }
+        }
       });
     } catch (error) {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
@@ -62,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        fetchActivities(); // Refresh the activities list
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
